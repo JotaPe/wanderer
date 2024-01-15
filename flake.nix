@@ -20,6 +20,7 @@
           version = "0.1.0";
           pwd = ./starsail/.;
           src = ./starsail/.;
+          modules = ./starsail/gomod2nix.toml;
         };
 
         packages.container = pkgs.dockerTools.buildImage {

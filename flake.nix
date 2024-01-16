@@ -15,25 +15,27 @@
           overlays = [ gomod2nix.overlays.default ];
         };
       in rec {
-        packages.default = pkgs.buildGoApplication {
+        packages.starsail = pkgs.buildGoApplication {
           pname = "wanderer.starsail";
           version = "0.1.0";
           pwd = ./starsail/.;
           src = ./starsail/.;
+          subPackages = [ "." ];
+          allowGoReference = true;
           modules = ./starsail/gomod2nix.toml;
         };
 
-        packages.container = pkgs.dockerTools.buildImage {
+        packages.containerStarsail = pkgs.dockerTools.buildImage {
           name = "wanderer.starsail";
           tag = "0.1.0";
           created = "now";
           copyToRoot = pkgs.buildEnv {
             name = "image-root";
-            paths = [packages.default];
-            pathsToLink = ["./bin"];
+            paths = [packages.wanderer];
+            pathsToLink = ["/bin"];
           };
           config = {
-            Cmd = ["${packages.default}/bin/wanderer.starsail"];
+            Cmd = ["${packages.wanderer}/bin/wanderer.starsail"];
             ExposedPorts = {"80/tcp" = { }; "443/tcp" = { }; };
           };
         };
@@ -48,6 +50,9 @@
             gopls
             delve
           ];
+          shellHook = ''
+          export DEV=1
+          '';
         };
       }
     );
